@@ -871,7 +871,12 @@ JNIEXPORT jstring JNICALL Java_com_iweka_ocr_PPOCRv5Ncnn_ocrFromImage(JNIEnv* en
         for (size_t j = 0; j < objects[i].text.size(); j++)
         {
             const Character& ch = objects[i].text[j];
-            if (ch.id >= 0 && ch.id < character_dict_size)
+            if (ch.id >= character_dict_size)
+            {
+                if (!line_text.empty() && line_text.back() != ' ')
+                    line_text += " "; // space token — keep it
+            }
+            else if (ch.id >= 0 && ch.id < character_dict_size)
             {
                 std::string c_str = character_dict[ch.id];
                 if (char_filter.empty())
@@ -955,7 +960,15 @@ JNIEXPORT jstring JNICALL Java_com_iweka_ocr_PPOCRv5Ncnn_ocrFromImageJson(JNIEnv
         for (size_t j = 0; j < objects[i].text.size(); j++)
         {
             const Character& ch = objects[i].text[j];
-            if (ch.id >= 0 && ch.id < character_dict_size)
+            if (ch.id >= character_dict_size)
+            {
+                // Space token (the class after all dict chars) — the recognize()
+                // path emits this as a space; the image path used to drop it,
+                // which is why words merged. Keep it.
+                if (!line_text.empty() && line_text.back() != ' ')
+                    line_text += " ";
+            }
+            else if (ch.id >= 0)
             {
                 std::string c_str = character_dict[ch.id];
                 if (char_filter.empty() ||
