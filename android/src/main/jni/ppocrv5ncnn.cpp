@@ -925,5 +925,71 @@ JNIEXPORT jstring JNICALL Java_com_iweka_ocr_PPOCRv5Ncnn_ocrFromImage(JNIEnv* en
     return env->NewStringUTF(all_text.c_str());
 }
 
+// public native String ocrFromImageJson(String imagePath);
+// Like ocrFromImage, but returns JSON with per-line box + confidence:
+//   [{"text":"...","prob":0.98,"points":[[x,y],[x,y],[x,y],[x,y]]}]
+JNIEXPORT jstring JNICALL Java_com_iweka_ocr_PPOCRv5Ncnn_ocrFromImageJson(JNIEnv* env, jobject thiz, jstring imagePath)
+{
+    const char* image_path = env->GetStringUTFChars(imagePath, nullptr);
+    cv::Mat bgr = cv::imread(image_path);
+    env->ReleaseStringUTFChars(imagePath, image_path);
+    if (bgr.empty())
+        return env->NewStringUTF("[]");
+
+    cv::Mat rgb;
+    cv::cvtColor(bgr, rgb, cv::COLOR_BGR2RGB);
+
+    ncnn::MutexLockGuard g(lock);
+    if (!g_ppocrv5)
+        return env->NewStringUTF("[]");
+
+    std::vector<Object> objects;
+    g_ppocrv5->detect_and_recognize(rgb, objects);
+
+    const std::string& char_filter = g_ppocrv5->get_char_filter();
+    std::string json = "[";
+    bool first = true;
+    for (size_t i = 0; i < objects.size(); i++)
+    {
+        std::string line_text;
+        for (size_t j = 0; j < objects[i].text.size(); j++)
+        {
+            const Character& ch = objects[i].text[j];
+            if (ch.id >= 0 && ch.id < character_dict_size)
+            {
+                std::string c_str = character_dict[ch.id];
+                if (char_filter.empty() ||
+                    (c_str.length() == 1 && char_filter.find(c_str[0]) != std::string::npos))
+                    line_text += c_str;
+            }
+        }
+        if (line_text.empty())
+            continue;
+
+        std::string esc;
+        for (char c : line_text)
+        {
+            if (c == '"' || c == '\\') { esc += '\\'; esc += c; }
+            else if (c == '\n') esc += "\\n";
+            else if ((unsigned char)c >= 0x20) esc += c;
+        }
+
+        cv::Point2f pts[4];
+        objects[i].rrect.points(pts);
+
+        if (!first) json += ",";
+        first = false;
+        json += "{\"text\":\"" + esc + "\",\"prob\":" + std::to_string(objects[i].prob) + ",\"points\":[";
+        for (int k = 0; k < 4; k++)
+        {
+            if (k) json += ",";
+            json += "[" + std::to_string((int)pts[k].x) + "," + std::to_string((int)pts[k].y) + "]";
+        }
+        json += "]}";
+    }
+    json += "]";
+    return env->NewStringUTF(json.c_str());
+}
+
 }
 

@@ -71,6 +71,10 @@ class Ocr {
     return OcrPlatform.instance.ocrFromImage(imagePath);
   }
 
+  Future<String?> ocrFromImageJson(String imagePath) {
+    return OcrPlatform.instance.ocrFromImageJson(imagePath);
+  }
+
   /// Set LED display preprocessing parameters.
   /// All values at 0 = General text mode (no preprocessing, reads any text).
   /// [valueThresh] - HSV Value threshold (0=off, 180-200 recommended for LED ghosting removal)

@@ -82,6 +82,10 @@ abstract class OcrPlatform extends PlatformInterface {
     throw UnimplementedError('ocrFromImage() has not been implemented.');
   }
 
+  Future<String?> ocrFromImageJson(String imagePath) {
+    throw UnimplementedError('ocrFromImageJson() has not been implemented.');
+  }
+
   /// Set LED preprocessing parameters.
   /// All values at 0 = General text mode (no preprocessing).
   /// [valueThresh] - HSV Value threshold (recommended: 180-200, 0=disabled)

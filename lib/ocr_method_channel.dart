@@ -97,6 +97,14 @@ class MethodChannelOcr extends OcrPlatform {
   }
 
   @override
+  Future<String?> ocrFromImageJson(String imagePath) async {
+    final result = await methodChannel.invokeMethod<String>('ocrFromImageJson', {
+      'imagePath': imagePath,
+    });
+    return result;
+  }
+
+  @override
   Future<bool> setLedParams(int valueThresh, int rThresh, int morphSize) async {
     final result = await methodChannel.invokeMethod<bool>('setLedParams', {
       'valueThresh': valueThresh,

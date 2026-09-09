@@ -135,6 +135,21 @@ class OcrPlugin: FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegistry
                 }
             }
         }
+        "ocrFromImageJson" -> {
+            val imagePath = call.argument<String>("imagePath") ?: ""
+            ocrExecutor.submit {
+                try {
+                    val json = ppocrv5ncnn.ocrFromImageJson(imagePath)
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        result.success(json)
+                    }
+                } catch (e: Exception) {
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        result.error("OCR_ERROR", e.message, null)
+                    }
+                }
+            }
+        }
         "setLedParams" -> {
             val valueThresh = call.argument<Int>("valueThresh") ?: 0
             val rThresh = call.argument<Int>("rThresh") ?: 0

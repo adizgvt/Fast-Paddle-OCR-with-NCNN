@@ -1,6 +1,6 @@
 name: fast_paddle_ocr
 description: "High-performance real-time OCR plugin for Flutter using NCNN and PP-OCRv5. Supports live camera preview, flash control, and photo capture with integrated text recognition."
-version: 0.0.5
+version: 0.0.6
 homepage: https://github.com/Saifulkamil/flutter_paddle_ocr
 repository: https://github.com/Saifulkamil/flutter_paddle_ocr
 
