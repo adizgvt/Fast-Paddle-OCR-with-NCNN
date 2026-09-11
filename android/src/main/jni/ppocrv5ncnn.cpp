@@ -1005,6 +1005,8 @@ JNIEXPORT jstring JNICALL Java_com_iweka_ocr_PPOCRv5Ncnn_ocrFromImageJson(JNIEnv
         json += "]}";
     }
     json += "]";
+    __android_log_print(ANDROID_LOG_WARN, "ncnn",
+        "ocrFromImageJson OUT (len=%d): %.300s", (int)json.size(), json.c_str());
     return env->NewStringUTF(json.c_str());
 }
 
