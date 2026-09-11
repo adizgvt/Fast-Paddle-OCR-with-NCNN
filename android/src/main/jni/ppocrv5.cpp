@@ -493,6 +493,10 @@ int PPOCRv5::recognize(const cv::Mat& rgb, Object& object)
     ncnn::Mat out;
     ex.extract("out0", out);
 
+    __android_log_print(ANDROID_LOG_WARN, "ncnn",
+        "REC out w=%d h=%d c=%d dims=%d (in %dx%d)",
+        out.w, out.h, out.c, out.dims, in.w, in.h);
+
     // 18385 x len
     int last_token = 0;
 
