@@ -951,6 +951,10 @@ JNIEXPORT jstring JNICALL Java_com_iweka_ocr_PPOCRv5Ncnn_ocrFromImageJson(JNIEnv
     std::vector<Object> objects;
     g_ppocrv5->detect_and_recognize(rgb, objects);
 
+    __android_log_print(ANDROID_LOG_WARN, "ncnn",
+        "ocrFromImageJson: dict_size=%d objects=%d img=%dx%d",
+        character_dict_size, (int)objects.size(), rgb.cols, rgb.rows);
+
     const std::string& char_filter = g_ppocrv5->get_char_filter();
     std::string json = "[";
     bool first = true;
